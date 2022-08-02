@@ -14,8 +14,11 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	//fakeRequest := fakerequest.CreateFakeRequest()
 
-	server()
+	go server()
 
+	for {
+
+	}
 	// for {
 	// 	res, err := fakeRequest()
 	// 	if err != nil {
@@ -35,15 +38,30 @@ func server() {
 	reqNumber := 1
 	for {
 		fmt.Printf("Send request %d\n", reqNumber)
-		r <- fmt.Sprintf("%d", reqNumber)
-		resp := <-resChannel
-		res, err := resp.Res, resp.Err
-		if err != nil {
-			color.Red("Error is %s\n", err)
-		} else {
-			color.Green("Response is %s\n", res)
+		select {
+		case resp := <-resChannel:
+			fmt.Println("got response")
+			res, err := resp.Res, resp.Err
+			if err != nil {
+				color.Red("Error is %s\n", err)
+			} else {
+				color.Green("Response is %s\n", res)
+			}
+		default:
+
 		}
+		//r <- fmt.Sprintf("%d", reqNumber)
+		fmt.Printf("after sleep")
+
+		// resp := <-resChannel
+		// res, err := resp.Res, resp.Err
+		// if err != nil {
+		// 	color.Red("Error is %s\n", err)
+		// } else {
+		// 	color.Green("Response is %s\n", res)
+		// }
 		time.Sleep(300 * time.Millisecond)
+
 		reqNumber += 1
 	}
 }
